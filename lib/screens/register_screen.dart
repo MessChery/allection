@@ -158,8 +158,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ? Colors.green
                                 : null,
                             errorText:
-                                emailController.text.isEmpty && _isSubmitted ||
-                                    _isEmailValid
+                                _isSubmitted &&
+                                    (emailController.text.isEmpty ||
+                                        !_isEmailValid)
                                 ? "Invalid email address"
                                 : null,
                           ),
