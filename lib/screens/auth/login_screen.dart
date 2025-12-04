@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../utils/colors.dart';
+import 'package:go_router/go_router.dart';
+import '../../utils/colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,17 +10,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   bool _obscureText = true;
-
-  final RegExp _emailRegex = RegExp(
-    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
-    r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
-    r"(?:\.[a-zA-Z]{2,})+$",
-  );
-
-  bool get _isEmailValid => _emailRegex.hasMatch(emailController.text);
+  bool _isSubmitted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         SizedBox(height: 48),
                         Text(
-                          "Email",
+                          "Username",
                           style: TextStyle(
                             fontSize: 15,
                             color: AllColors.secondaryColor,
@@ -96,10 +90,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         TextFormField(
-                          controller: emailController,
+                          controller: usernameController,
                           onChanged: (value) => setState(() {}),
                           decoration: InputDecoration(
-                            hintText: "Insert your email",
+                            hintText: "Insert your username",
                             hintStyle: TextStyle(
                               color: Colors.grey.shade400,
                               fontSize: 12,
@@ -116,16 +110,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: 2,
                               ),
                             ),
-                            suffixIcon: _isEmailValid
-                                ? Icon(Icons.check)
-                                : null,
-                            suffixIconColor: _isEmailValid
-                                ? Colors.green
-                                : null,
                             errorText:
-                                emailController.text.isEmpty || _isEmailValid
-                                ? null
-                                : "Invalid email address",
+                                _isSubmitted && usernameController.text.isEmpty
+                                ? "Invalid username"
+                                : null,
                           ),
                           onTapOutside: (_) {
                             FocusScope.of(context).unfocus();
@@ -172,6 +160,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                             ),
+                            errorText:
+                                _isSubmitted && passwordController.text.isEmpty
+                                ? "Invalid password"
+                                : null,
                           ),
                           onTapOutside: (_) {
                             FocusScope.of(context).unfocus();
@@ -201,7 +193,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         SizedBox(height: 32),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              _isSubmitted = true;
+                            });
+
+                            // Implementar funcionalidade de login
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AllColors.primaryColor,
                             minimumSize: Size(double.infinity, 48),
@@ -236,7 +234,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                context.go('/register');
+                              },
                               child: Text(
                                 "Sign Up",
                                 style: TextStyle(
