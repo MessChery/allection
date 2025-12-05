@@ -1,11 +1,11 @@
 import 'package:allection/screens/auth/login_screen.dart';
-import 'package:allection/screens/auth/main_screen.dart';
-import 'package:allection/screens/register_screen.dart';
+import 'package:allection/screens/home/main_screen.dart';
+import 'package:allection/screens/auth/register_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: "/login",
+    initialLocation: "/home",
     routes: [
       // HomeScreen
       GoRoute(path: '/home', builder: (context, state) => const MainScreen()),

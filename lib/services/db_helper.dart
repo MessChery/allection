@@ -25,20 +25,39 @@ class MongoDatabase {
       var result = await userCollection.findOne({'email': email});
       return result == null ? '' : result.toString();
     } catch (e) {
-      throw 'Error fetching users: $e';
+      throw 'Error fetching user: $e';
     }
   }
 
-  static Future<String> insertUser(String email, String password) async {
+  static Future<String> insertUser(
+    String email,
+    String username,
+    String password,
+  ) async {
     try {
       var result = await userCollection.insertOne({
         'email': email,
+        'username': username,
         'password': password,
         'createdAt': DateTime.now().toString(),
       });
       return 'User inserted with id: ${result.id}';
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  static Future<String> fetchLoginUser(String username, String password) async {
+    try {
+      var result = await userCollection.findOne({
+        'username': username,
+        'password': password,
+      });
+      return result == null
+          ? 'Incorrect username or password'
+          : result.toString();
+    } catch (e) {
+      throw 'Error fetching login user: $e';
     }
   }
 }

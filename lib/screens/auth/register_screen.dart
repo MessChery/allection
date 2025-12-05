@@ -32,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<String> registerUser() async {
     String email = emailController.text.trim();
+    String username = usernameController.text.trim();
     String password1 = passwordController.text;
     String password2 = confirmPasswordController.text;
 
@@ -44,6 +45,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (password1 != password2) {
       throw 'Passwords do not match';
     }
+    if (username.isEmpty) {
+      throw 'Please enter a username';
+    }
 
     final password = password1;
 
@@ -52,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       throw 'Email is already registered';
     }
 
-    final result = await MongoDatabase.insertUser(email, password);
+    final result = await MongoDatabase.insertUser(email, username, password);
     return result;
   }
 
@@ -252,9 +256,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               },
                             ),
                             errorText:
-                                passwordController.text.length >= 6 ||
-                                    passwordController.text.isEmpty &&
-                                        _isSubmitted
+                                _isSubmitted &&
+                                    (passwordController.text.length <= 6 ||
+                                        passwordController.text.isEmpty)
                                 ? "Password must be at least 6 characters"
                                 : null,
                           ),
@@ -306,7 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             errorText:
                                 _isSubmitted &&
-                                    (confirmPasswordController.text ==
+                                    (confirmPasswordController.text !=
                                             passwordController.text ||
                                         confirmPasswordController.text.isEmpty)
                                 ? "Passwords do not match"

@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:allection/models/snackbar.dart';
+import 'package:allection/services/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/colors.dart';
@@ -14,6 +18,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   bool _obscureText = true;
   bool _isSubmitted = false;
+
+  Future<String> loginUser() async {
+    String username = usernameController.text.trim();
+    String password = passwordController.text.trim();
+
+    String result = await MongoDatabase.fetchLoginUser(username, password);
+
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +104,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         TextFormField(
                           controller: usernameController,
-                          onChanged: (value) => setState(() {}),
+                          onChanged: (value) => setState(() {
+                            if (_isSubmitted) {
+                              _isSubmitted = false;
+                            }
+                          }),
                           decoration: InputDecoration(
                             hintText: "Insert your username",
                             hintStyle: TextStyle(
@@ -193,12 +210,37 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         SizedBox(height: 32),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               _isSubmitted = true;
                             });
-
-                            // Implementar funcionalidade de login
+                            if (usernameController.text.isEmpty ||
+                                passwordController.text.isEmpty) {
+                              return;
+                            }
+                            try {
+                              final result = await loginUser();
+                              if (!mounted) return;
+                              if (result.contains(
+                                'Incorrect username or password',
+                              )) {
+                                CustomSnackBar.show(
+                                  context,
+                                  message: 'Incorrect username or password',
+                                  isError: true,
+                                );
+                              } else {
+                                context.go('/home');
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                CustomSnackBar.show(
+                                  context,
+                                  message: 'Login failed: $e',
+                                  isError: true,
+                                );
+                              }
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AllColors.primaryColor,
